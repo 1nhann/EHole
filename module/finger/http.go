@@ -24,7 +24,7 @@ type resps struct {
 	favhash    string
 }
 
-func rndua() string {
+func Rndua() string {
 	ua := []string{"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 YaBrowser/22.1.0.2517 Yowser/2.5 Safari/537.36",
 		"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101 Firefox/91.0",
 		"Mozilla/5.0 (X11; Linux x86_64; rv:96.0) Gecko/20100101 Firefox/96.0",
@@ -54,8 +54,11 @@ func gettitle(httpbody string) string {
 	return title
 }
 
-func getfavicon(httpbody string, turl string) string {
+func Getfavicon(httpbody string, turl string) string {
 	faviconpaths := xegexpjs(`href="(.*?favicon....)"`, httpbody)
+	if len(faviconpaths) == 0 {
+		faviconpaths = xegexpjs(`href="(.*\.ico)"`, httpbody)
+	}
 	var faviconpath string
 	u, err := url.Parse(turl)
 	if err != nil {
@@ -108,7 +111,7 @@ func httprequest(url1 []string, proxy string) (*resps, error) {
 	req.AddCookie(cookie)
 	req.Header.Set("Accept", "*/*;q=0.8")
 	req.Header.Set("Connection", "close")
-	req.Header.Set("User-Agent", rndua())
+	req.Header.Set("User-Agent", Rndua())
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, err
@@ -117,7 +120,7 @@ func httprequest(url1 []string, proxy string) (*resps, error) {
 	result, _ := ioutil.ReadAll(resp.Body)
 	contentType := strings.ToLower(resp.Header.Get("Content-Type"))
 	httpbody := string(result)
-	httpbody = toUtf8(httpbody, contentType)
+	httpbody = ToUtf8(httpbody, contentType)
 	title := gettitle(httpbody)
 	httpheader := resp.Header
 	var server string
@@ -138,7 +141,7 @@ func httprequest(url1 []string, proxy string) (*resps, error) {
 	} else {
 		jsurl = []string{""}
 	}
-	favhash := getfavicon(httpbody, url1[0])
+	favhash := Getfavicon(httpbody, url1[0])
 	s := resps{url1[0], httpbody, resp.Header, server, resp.StatusCode, len(httpbody), title, jsurl, favhash}
 	return &s, nil
 }

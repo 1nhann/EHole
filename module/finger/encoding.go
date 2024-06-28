@@ -8,7 +8,7 @@ import (
 	"golang.org/x/net/html/charset"
 )
 
-func toUtf8(content string, contentType string) string {
+func ToUtf8(content string, contentType string) string {
 	var htmlEncode string
 	var htmlEncode2 string
 	var htmlEncode3 string
